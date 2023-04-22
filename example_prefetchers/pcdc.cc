@@ -94,12 +94,11 @@ void dc_prefetch(int cpu_num, unsigned long long int addr, long long int ptr) {
       l2_prefetch_line(cpu_num, addr, current.pair.entry0 + addr, FILL_L2);
       l2_prefetch_line(cpu_num, addr, current.pair.entry1 + addr, FILL_L2);
       fetch_count += 2;
-      ptr = current.next;
     } else if (current.pair.state == PAIR_PREP1) {
       l2_prefetch_line(cpu_num, addr, current.pair.entry0 + addr, FILL_L2);
       fetch_count += 1;
-      ptr = current.next;
     }
+    ptr = current.next;
   }
 }
 
