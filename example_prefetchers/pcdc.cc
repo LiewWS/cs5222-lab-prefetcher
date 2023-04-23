@@ -89,17 +89,18 @@ long long int ghb_update(unsigned long long int addr, long long int next_ptr) {
 void dc_prefetch(int cpu_num, unsigned long long int addr, long long int ptr) {
   int fetch_count = 0;
   unsigned long long int fetch_addr = addr;
+  int fill_target = (get_l2_mshr_occupancy(cpu_num) < 8) ? FILL_LLC : FILL_L2;
   while ((ptr != -1) && (fetch_count < PCDC_DEGREE)) {
     ghb_entry_t current = GlobalHistoryBuffer[ptr];
     if (current.pair.state == PAIR_VALID) {
       fetch_addr += current.pair.entry0;
-      l2_prefetch_line(cpu_num, addr, fetch_addr, FILL_L2);
+      l2_prefetch_line(cpu_num, addr, fetch_addr, fill_target);
       fetch_addr += current.pair.entry1;
-      l2_prefetch_line(cpu_num, addr, fetch_addr, FILL_L2);
+      l2_prefetch_line(cpu_num, addr, fetch_addr, fill_target);
       fetch_count += 2;
     } else if (current.pair.state == PAIR_PREP1) {
       fetch_addr += current.pair.entry0;
-      l2_prefetch_line(cpu_num, addr, fetch_addr, FILL_L2);
+      l2_prefetch_line(cpu_num, addr, fetch_addr, fill_target);
       fetch_count += 1;
     }
     ptr = current.next;
