@@ -159,7 +159,7 @@ void l2_prefetcher_operate(int cpu_num, unsigned long long int addr, unsigned lo
   long long int ptr = ghb_update(addr, next_ptr);
 
   // Prefetch
-  dc_prefetch(cpu_num, addr, ptr);
+  dc_prefetch(cpu_num, addr, GlobalHistoryBuffer[ptr].next);
 }
 
 void l2_cache_fill(int cpu_num, unsigned long long int addr, int set, int way, int prefetch, unsigned long long int evicted_addr)
