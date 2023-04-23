@@ -94,13 +94,19 @@ void dc_prefetch(int cpu_num, unsigned long long int addr, long long int ptr) {
     ghb_entry_t current = GlobalHistoryBuffer[ptr];
     if (current.pair.state == PAIR_VALID) {
       fetch_addr += current.pair.entry0;
-      l2_prefetch_line(cpu_num, addr, fetch_addr, fill_target);
+      if ((fetch_addr >> 12) == (addr >> 12)) {
+        l2_prefetch_line(cpu_num, addr, fetch_addr, fill_target);
+      }
       fetch_addr += current.pair.entry1;
-      l2_prefetch_line(cpu_num, addr, fetch_addr, fill_target);
+      if ((fetch_addr >> 12) == (addr >> 12)) {
+        l2_prefetch_line(cpu_num, addr, fetch_addr, fill_target);
+      }
       fetch_count += 2;
     } else if (current.pair.state == PAIR_PREP1) {
       fetch_addr += current.pair.entry0;
-      l2_prefetch_line(cpu_num, addr, fetch_addr, fill_target);
+      if ((fetch_addr >> 12) == (addr >> 12)) {
+        l2_prefetch_line(cpu_num, addr, fetch_addr, fill_target);
+      }
       fetch_count += 1;
     }
     ptr = current.next;
