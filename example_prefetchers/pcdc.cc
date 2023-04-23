@@ -66,23 +66,23 @@ correlation_pair_t ghb_transition(correlation_pair_t current, unsigned long long
 }
 
 long long int ghb_update(unsigned long long int addr, long long int next_ptr) {
+  if (GlobalHistoryBuffer[ghb_head].pair.state == PAIR_VALID) {
+    // Invalidate entry
+    GlobalHistoryBuffer[ghb_head].pair = ghb_transition(GlobalHistoryBuffer[ghb_head].pair, 0);
+    GlobalHistoryBuffer[ghb_head].next = -1;
+  } else {
+    GlobalHistoryBuffer[ghb_head].next = next_ptr;
+  }
+
   int count = 0;
-  long long int ret = ghb_head;
   for (long long int i = ghb_head; (i >= 0) && (count < 3); --i) {
     correlation_pair_t current = GlobalHistoryBuffer[i].pair;
     GlobalHistoryBuffer[i].pair = ghb_transition(current, addr);
     ++count;
   }
 
-  ghb_entry_t head_entry = GlobalHistoryBuffer[ret];
-  if (head_entry.pair.state == PAIR_INVALID) {
-    GlobalHistoryBuffer[ret].next = -1;
-  } else {
-    GlobalHistoryBuffer[ret].next = next_ptr;
-  }
-
+  long long int ret = ghb_head;
   ghb_head = (ghb_head + 1) % GHB_ENTRIES;
-
   return ret;
 }
 
